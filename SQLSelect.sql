@@ -1,0 +1,3 @@
+SELECT * FROM CW2.Users;
+SELECT * FROM CW2.Trail;
+SELECT * FROM CW2.TrailPoint;
