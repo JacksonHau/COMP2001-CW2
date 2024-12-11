@@ -29,7 +29,11 @@ CREATE TABLE CW2.Trail
     FOREIGN KEY (User_ID) REFERENCES CW2.Users(User_ID)
 );
 
--- RECREATE TRAIL POINT TABLE FOR CW2
+---------------------------------------
+---------------------------------------
+-- RECREATE TRAIL POINT TABLE FOR CW2--
+----------------- SEED ----------------
+---------------------------------------
 CREATE TABLE CW2.TrailPoint
 (
     Point_ID INT PRIMARY KEY,
