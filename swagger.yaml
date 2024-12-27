@@ -1,0 +1,151 @@
+openapi: 3.0.0
+
+info:
+  title: "COMP2001 Trail Management API"
+  description: "API for managing hiking trails, including operations for creating, reading, updating, and deleting trails."
+  version: "1.0.0"
+  contact:
+    name: "Jackson Hau"
+    email: "jackson.hau@students.plymouth.ac.uk"
+
+servers:
+  - url: "/api"
+
+tags:
+  - name: "trails"
+    description: "Operations related to trails in the Trail Management System"
+
+paths:
+  /trails:
+    get:
+      tags:
+        - "trails"
+      summary: "List all trails"
+      operationId: "listTrails"
+      responses:
+        '200':
+          description: "A list of trails"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: '#/components/schemas/Trail'
+
+    post:
+      tags:
+        - "trails"
+      summary: "Create a new trail"
+      operationId: "createTrail"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Trail'
+      responses:
+        '201':
+          description: "Trail created successfully"
+        '400':
+          description: "Invalid input"
+
+  /trails/{trail_id}:
+    get:
+      tags:
+        - "trails"
+      summary: "Get a trail by ID"
+      operationId: "getTrailById"
+      parameters:
+        - name: "trail_id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+      responses:
+        '200':
+          description: "Detailed information of a trail"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trail'
+        '404':
+          description: "Trail not found"
+
+    put:
+      tags:
+        - "trails"
+      summary: "Update an existing trail"
+      operationId: "updateTrail"
+      parameters:
+        - name: "trail_id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Trail'
+      responses:
+        '200':
+          description: "Trail updated successfully"
+        '404':
+          description: "Trail not found"
+        '400':
+          description: "Invalid input"
+
+    delete:
+      tags:
+        - "trails"
+      summary: "Delete a trail"
+      operationId: "deleteTrail"
+      parameters:
+        - name: "trail_id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+      responses:
+        '204':
+          description: "Trail deleted successfully"
+        '404':
+          description: "Trail not found"
+
+components:
+  schemas:
+    Trail:
+      type: "object"
+      required:
+        - "trail_name"
+        - "user_id"
+        - "distance"
+      properties:
+        trail_id:
+          type: "integer"
+          format: "int32"
+        trail_name:
+          type: "string"
+        description:
+          type: "string"
+        country_id:
+          type: "integer"
+        state_id:
+          type: "integer"
+        city_id:
+          type: "integer"
+        distance:
+          type: "number"
+          format: "float"
+        elevation_gain:
+          type: "integer"
+        estimated_time:
+          type: "integer"
+        route_type:
+          type: "string"
+        user_id:
+          type: "integer"
+        created_on:
+          type: "string"
+          format: "date"
