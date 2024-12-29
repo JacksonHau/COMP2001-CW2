@@ -1,17 +1,17 @@
+from flask import request, jsonify
 from db import get_db_connection, close_db_connection
 
 # List of Trails
 def list_trails():
     conn = get_db_connection()
-    if conn is None:
-        return {"message": "Database connection failed"}, 500
-
+    if not conn:
+        return jsonify({'message': 'Database connection failed'}), 500
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM CW2.Trail")
     trails = cursor.fetchall()
     trails_list = [{'trail_id': trail[0], 'trail_name': trail[1], 'description': trail[2]} for trail in trails]
     close_db_connection(conn)
-    return trails_list, 200
+    return jsonify(trails_list), 200
 
 # Create Trails
 def create_trail(trail_data):
