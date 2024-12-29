@@ -1,0 +1,13 @@
+attrs
+wheel
+jinja2
+pyodbc
+flask
+Flask==1.1.2
+Flask-SQLAlchemy
+Flask-Marshmallow
+marshmallow-sqlalchemy
+connexion[swagger-ui]
+flask_sqlalchemy
+pip
+python-dotenv

@@ -21,7 +21,7 @@ paths:
       tags:
         - "trails"
       summary: "List all trails"
-      operationId: "listTrails"
+      operationId: "handlers.list_trails"
       responses:
         '200':
           description: "A list of trails"
@@ -36,7 +36,7 @@ paths:
       tags:
         - "trails"
       summary: "Create a new trail"
-      operationId: "createTrail"
+      operationId: "handlers.create_trail"
       requestBody:
         required: true
         content:
@@ -54,7 +54,7 @@ paths:
       tags:
         - "trails"
       summary: "Get a trail by ID"
-      operationId: "getTrailById"
+      operationId: "handlers.get_trail_by_id"
       parameters:
         - name: "trail_id"
           in: "path"
@@ -75,7 +75,7 @@ paths:
       tags:
         - "trails"
       summary: "Update an existing trail"
-      operationId: "updateTrail"
+      operationId: "handlers.update_trail"
       parameters:
         - name: "trail_id"
           in: "path"
@@ -100,7 +100,7 @@ paths:
       tags:
         - "trails"
       summary: "Delete a trail"
-      operationId: "deleteTrail"
+      operationId: "handlers.delete_trail"  # Assuming you have a function `delete_trail` in `handlers.py`
       parameters:
         - name: "trail_id"
           in: "path"
