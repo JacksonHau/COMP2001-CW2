@@ -12,18 +12,18 @@ swagger = Swagger(app)
 logging.basicConfig(level=logging.DEBUG)
 
 class TrailResource(Resource):
-    def get(self, trail_id):
+    def create(self, trail_id):
         """Retrieve a trail by its ID."""
         trail, status = read_trail(trail_id)
         return jsonify(trail), status
 
-    def post(self):
+    def read(self):
         """Create a new trail."""
         trail_data = request.get_json()
         result, status = create_trail(trail_data)
         return jsonify(result), status
 
-    def put(self, trail_id):
+    def update(self, trail_id):
         """Update an existing trail."""
         trail_data = request.get_json()
         result, status = update_trail(trail_id, trail_data)
