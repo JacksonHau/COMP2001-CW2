@@ -11,3 +11,4 @@ connexion[swagger-ui]
 flask_sqlalchemy
 pip
 python-dotenv
+connexion[flask]

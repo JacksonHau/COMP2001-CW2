@@ -9,7 +9,7 @@ basedir = pathlib.Path(__file__).parent.resolve()
 # Set up Connexion
 connex_app = connexion.App(__name__, specification_dir=basedir)
 
-# Determine environment (local or production)
+# Determine environment
 LOCAL = False
 
 # Database configuration
