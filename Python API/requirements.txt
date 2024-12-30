@@ -12,3 +12,6 @@ flask_sqlalchemy
 pip
 python-dotenv
 connexion[flask]
+Flask
+Flask-Restful
+Flasgger
