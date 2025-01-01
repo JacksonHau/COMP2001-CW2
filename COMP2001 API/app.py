@@ -29,7 +29,7 @@ API_URL = '/static/swagger.json'
 swaggerui_blueprint = get_swaggerui_blueprint(SWAGGER_URL, API_URL)
 app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
 
-# Models
+# Every Models
 class User(db.Model):
     __tablename__ = 'Users'
     __table_args__ = {'schema': 'CW2'}
@@ -68,7 +68,7 @@ class TrailPoint(db.Model):
 def home():
     return "Welcome to the Trail API. Use /swagger to access API documentation."
 
-# CRUD Routes for Users
+# CRUD operations for User
 @app.route("/users", methods=["GET"])
 def get_users():
     users = User.query.all()
@@ -81,8 +81,6 @@ def create_user():
     db.session.add(new_user)
     db.session.commit()
     return jsonify({"message": "User created successfully."}), 201
-
-# Additional CRUD operations for Trail and TrailPoint can be defined similarly
 
 if __name__ == '__main__':
     host = '127.0.0.1'
