@@ -3,12 +3,15 @@ CREATE SCHEMA CW2;
 GO
 
 -- RECREATE USER TABLE FOR CW2
-CREATE TABLE CW2.Users 
-(
-    User_ID INT PRIMARY KEY,
-    Username NVARCHAR(100) UNIQUE NOT NULL,
-    Name NVARCHAR(100),
-    Created_On DATE NOT NULL
+CREATE TABLE [CW2].[Users] (
+    [User_ID]    INT            NOT NULL,
+    [Username]   NVARCHAR (100) NOT NULL,
+    [Name]       NVARCHAR (100) NULL,
+    [Created_On] DATE           NOT NULL,
+    [Email]      NVARCHAR (255) NULL,
+    [Password]   NVARCHAR (255) DEFAULT ('defaultPassword') NOT NULL,
+    PRIMARY KEY CLUSTERED ([User_ID] ASC),
+    UNIQUE NONCLUSTERED ([Username] ASC)
 );
 
 -- RECREATE TRAIL TABLE FOR CW2
