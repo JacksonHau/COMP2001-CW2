@@ -88,16 +88,14 @@ def login():
 @jwt_required()
 def insert_trail():
     try:
-        # Get JSON data from request
         data = request.get_json()
-        # Validate using TrailSchema
+        logging.debug(f"Received data: {data}")
         trail_data = TrailSchema().load(data)
     except ValidationError as err:
-        # Return validation errors
+        logging.error(f"Validation error: {err.messages}")
         return jsonify({"errors": err.messages}), 422
 
     try:
-        # Execute the stored procedure using validated data
         stmt = text("""
             EXEC CW2.InsertTrail 
                 @Trail_Name = :Trail_Name,
@@ -114,9 +112,8 @@ def insert_trail():
         db.session.execute(stmt, trail_data)
         db.session.commit()
         return jsonify({"message": "Trail inserted successfully"}), 201
-
     except Exception as e:
-        logging.error(f"Error inserting trail: {e}")
+        logging.error(f"Database error: {e}")
         return jsonify({"message": "An error occurred while inserting the trail"}), 500
 
 @app.route("/trails/read", methods=["GET"])
