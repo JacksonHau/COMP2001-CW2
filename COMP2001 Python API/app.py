@@ -143,50 +143,6 @@ def read_trail():
         logging.error(f"Error reading trails: {e}")
         return jsonify({"message": "An error occurred while fetching trails"}), 500
 
-@app.route("/trails/update", methods=["PUT"])
-@jwt_required()
-def update_trail():
-    try:
-        # Retrieve data from the request
-        data = request.get_json()
-        logging.debug(f"Received data for update: {data}")
-
-        # Validate input against TrailSchema
-        trail_schema = TrailSchema()
-        trail_data = trail_schema.load(data)
-
-        # Ensure Trail_ID is present in the request
-        trail_id = data.get("Trail_ID")
-        if not trail_id:
-            return jsonify({"error": "Trail_ID is required to update a trail"}), 400
-
-        # Execute the update stored procedure
-        stmt = text("""
-            EXEC CW2.UpdateTrail 
-                @Trail_ID = :Trail_ID,
-                @Trail_Name = :Trail_Name,
-                @Description = :Description,
-                @Country_ID = :Country_ID,
-                @State_ID = :State_ID,
-                @City_ID = :City_ID,
-                @Distance = :Distance,
-                @Elevation_Gain = :Elevation_Gain,
-                @Estimated_Time = :Estimated_Time,
-                @Route_Type = :Route_Type,
-                @User_ID = :User_ID
-        """)
-        trail_data["Trail_ID"] = trail_id
-        db.session.execute(stmt, trail_data)
-        db.session.commit()
-
-        return jsonify({"message": "Trail updated successfully"}), 200
-    except ValidationError as err:
-        logging.error(f"Validation error during update: {err.messages}")
-        return jsonify({"errors": err.messages}), 422
-    except Exception as e:
-        logging.error(f"Error updating trail: {e}")
-        return jsonify({"error": "An error occurred while updating the trail"}), 500
-
 @app.route("/trails/delete", methods=["DELETE"])
 @jwt_required()
 def delete_trail():

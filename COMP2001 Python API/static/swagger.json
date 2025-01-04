@@ -1,320 +1,219 @@
 {
-    "swagger": "2.0",
-    "info": {
-        "version": "1.0.0",
-        "title": "Trail API",
-        "description": "API documentation for the Trail application."
-    },
-    "host": "127.0.0.1:5000",
-    "basePath": "/",
-    "schemes": ["http"],
-    "securityDefinitions": {
-        "BearerAuth": {
-            "type": "apiKey",
-            "name": "Authorization",
-            "in": "header",
-            "description": "Enter 'Bearer' followed by a space and your token. Example: Bearer abc123xyz"
-        }
-    },
-    "paths": {
-        "/users": {
-            "get": {
-                "summary": "Get all users",
-                "description": "Retrieve a list of all users.",
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "List of all users",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "object",
-                                "properties": {
-                                    "User_ID": { "type": "integer" },
-                                    "Email": { "type": "string" },
-                                    "Name": { "type": "string" },
-                                    "Created_On": { "type": "string", "format": "date" }
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized - Invalid or missing token"
-                    }
-                }
-            }
-        },
-        "/login": {
-            "post": {
-                "summary": "Login a user",
-                "description": "Authenticate a user using email and return a JWT token if successful.",
-                "parameters": [
-                    {
-                        "in": "body",
-                        "name": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "Email": { "type": "string" },
-                                "Password": { "type": "string" }
-                            },
-                            "required": ["Email", "Password"]
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Login successful",
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "access_token": { "type": "string" }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Invalid email or password"
-                    }
-                }
-            }
-        },
-        "/trails": {
-            "get": {
-                "summary": "Get all trails",
-                "description": "Retrieve a list of all trails.",
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "List of all trails",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "object",
-                                "properties": {
-                                    "Trail_ID": { "type": "integer" },
-                                    "Trail_Name": { "type": "string" },
-                                    "Description": { "type": "string" },
-                                    "Distance": { "type": "number", "format": "float" },
-                                    "Created_On": { "type": "string", "format": "date" },
-                                    "User_ID": { "type": "integer" },
-                                    "Country_ID": { "type": "integer" },
-                                    "State_ID": { "type": "integer" },
-                                    "City_ID": { "type": "integer" },
-                                    "Elevation_Gain": { "type": "integer" },
-                                    "Estimated_Time": { "type": "integer" },
-                                    "Route_Type": { "type": "string" }
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized - Invalid or missing token"
-                    }
-                }
-            },
-            "post": {
-                "summary": "Insert a new trail",
-                "description": "Insert a new trail into the database using the InsertTrail stored procedure.",
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "parameters": [
-                    {
-                        "in": "body",
-                        "name": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "Trail_Name": { "type": "string" },
-                                "Description": { "type": "string" },
-                                "Country_ID": { "type": "integer" },
-                                "State_ID": { "type": "integer" },
-                                "City_ID": { "type": "integer" },
-                                "Distance": { "type": "number", "format": "float" },
-                                "Elevation_Gain": { "type": "integer" },
-                                "Estimated_Time": { "type": "integer" },
-                                "Route_Type": { "type": "string" },
-                                "User_ID": { "type": "integer" }
-                            },
-                            "required": [
-                                "Trail_Name", "Country_ID", "State_ID", "City_ID",
-                                "Distance", "Elevation_Gain", "Estimated_Time", "Route_Type", "User_ID"
-                            ]
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Trail inserted successfully"
-                    },
-                    "400": {
-                        "description": "Invalid input - Missing required fields"
-                    },
-                    "422": {
-                        "description": "Unprocessable entity - Invalid data types"
-                    },
-                    "401": {
-                        "description": "Unauthorized - Invalid or missing token"
-                    }
-                }
-            }
-        },
-        "/trails/update": {
-            "put": {
-                "summary": "Update a trail",
-                "description": "Update an existing trail using the UpdateTrail stored procedure.",
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "parameters": [
-                    {
-                        "in": "body",
-                        "name": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "Trail_ID": { "type": "integer" },
-                                "Trail_Name": { "type": "string" },
-                                "Description": { "type": "string" },
-                                "Country_ID": { "type": "integer" },
-                                "State_ID": { "type": "integer" },
-                                "City_ID": { "type": "integer" },
-                                "Distance": { "type": "number", "format": "float" },
-                                "Elevation_Gain": { "type": "integer" },
-                                "Estimated_Time": { "type": "integer" },
-                                "Route_Type": { "type": "string" },
-                                "User_ID": { "type": "integer" }
-                            },
-                            "required": [
-                                "Trail_ID", "Trail_Name", "Country_ID", "State_ID",
-                                "City_ID", "Distance", "Elevation_Gain", "Estimated_Time", "Route_Type", "User_ID"
-                            ]
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Trail updated successfully"
-                    },
-                    "400": {
-                        "description": "Trail_ID is required"
-                    },
-                    "422": {
-                        "description": "Validation error"
-                    },
-                    "500": {
-                        "description": "An error occurred while updating the trail"
-                    }
-                }
-            }
-        },
-        "/trails/read": {
-            "get": {
-                "summary": "Read trails",
-                "description": "Retrieve trails from the database using the ReadTrail stored procedure.",
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "parameters": [
-                    {
-                        "name": "Trail_ID",
-                        "in": "query",
-                        "required": false,
-                        "type": "integer",
-                        "description": "Filter by Trail ID"
-                    },
-                    {
-                        "name": "Trail_Name",
-                        "in": "query",
-                        "required": false,
-                        "type": "string",
-                        "description": "Filter by Trail Name"
-                    },
-                    {
-                        "name": "User_ID",
-                        "in": "query",
-                        "required": false,
-                        "type": "integer",
-                        "description": "Filter by User ID"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "List of trails matching the criteria",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "object",
-                                "properties": {
-                                    "Trail_ID": { "type": "integer" },
-                                    "Trail_Name": { "type": "string" },
-                                    "Description": { "type": "string" },
-                                    "Country_ID": { "type": "integer" },
-                                    "State_ID": { "type": "integer" },
-                                    "City_ID": { "type": "integer" },
-                                    "Distance": { "type": "number", "format": "float" },
-                                    "Elevation_Gain": { "type": "integer" },
-                                    "Estimated_Time": { "type": "integer" },
-                                    "Route_Type": { "type": "string" },
-                                    "User_ID": { "type": "integer" },
-                                    "Created_On": { "type": "string", "format": "date" }
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "An error occurred while fetching trails"
-                    }
-                }
-            }
-        },
-        "/trails/delete": {
-            "delete": {
-                "summary": "Delete a trail",
-                "description": "Delete a specific trail by its ID.",
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "parameters": [
-                    {
-                        "name": "Trail_ID",
-                        "in": "query",
-                        "required": true,
-                        "type": "integer",
-                        "description": "ID of the trail to delete"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Trail deleted successfully"
-                    },
-                    "401": {
-                        "description": "Unauthorized - Invalid or missing token"
-                    },
-                    "404": {
-                        "description": "Trail not found"
-                    }
-                }
-            }
-        }
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Trail API",
+    "description": "API documentation for the Trail API microservice."
+  },
+  "host": "127.0.0.1:5000",
+  "basePath": "/",
+  "schemes": ["http"],
+  "securityDefinitions": {
+    "BearerAuth": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header",
+      "description": "Use 'Bearer <your-token>' to authenticate."
     }
+  },
+  "security": [
+    {
+      "BearerAuth": []
+    }
+  ],
+  "paths": {
+    "/login": {
+      "post": {
+        "summary": "User Login",
+        "description": "Authenticate a user and return a JWT token if credentials are valid.",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "credentials",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "Email": { "type": "string", "example": "user@example.com" },
+                "Password": { "type": "string", "example": "password123" }
+              },
+              "required": ["Email", "Password"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authentication successful",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "access_token": { "type": "string" }
+              }
+            }
+          },
+          "401": { "description": "Invalid credentials" },
+          "500": { "description": "An error occurred during login" }
+        }
+      }
+    },
+    "/trails": {
+      "get": {
+        "summary": "Get All Trails",
+        "description": "Retrieve a list of all trails.",
+        "responses": {
+          "200": {
+            "description": "List of trails",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "Trail_ID": { "type": "integer" },
+                  "Trail_Name": { "type": "string", "maxLength": 255 },
+                  "Description": { "type": "string", "nullable": true },
+                  "Country_ID": { "type": "integer", "nullable": true },
+                  "State_ID": { "type": "integer", "nullable": true },
+                  "City_ID": { "type": "integer", "nullable": true },
+                  "Distance": { "type": "number", "format": "float" },
+                  "Created_On": { "type": "string", "format": "date" },
+                  "Elevation_Gain": { "type": "integer", "nullable": true },
+                  "Estimated_Time": { "type": "integer", "nullable": true },
+                  "Route_Type": { "type": "string", "enum": ["Point to Point", "Out & Back", "Loop"], "nullable": true },
+                  "User_ID": { "type": "integer" }
+                }
+              }
+            }
+          },
+          "500": { "description": "Error fetching trails" }
+        }
+      },
+      "post": {
+        "summary": "Create New Trail",
+        "description": "Add a new trail to the database.",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "trail",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "Trail_Name": { "type": "string", "example": "Mountain Path", "maxLength": 255 },
+                "Description": { "type": "string", "example": "A scenic mountain path", "nullable": true },
+                "Country_ID": { "type": "integer", "example": 44, "nullable": true },
+                "State_ID": { "type": "integer", "example": 10, "nullable": true },
+                "City_ID": { "type": "integer", "example": 5, "nullable": true },
+                "Distance": { "type": "number", "example": 10.5, "format": "float" },
+                "Created_On": { "type": "string", "format": "date", "example": "2025-01-04" },
+                "Elevation_Gain": { "type": "integer", "example": 200, "nullable": true },
+                "Estimated_Time": { "type": "integer", "example": 120, "nullable": true },
+                "Route_Type": { "type": "string", "enum": ["Point to Point", "Out & Back", "Loop"], "example": "Loop", "nullable": true },
+                "User_ID": { "type": "integer", "example": 1 }
+              },
+              "required": ["Trail_Name", "Distance", "Created_On", "User_ID"]
+            }
+          }
+        ],
+        "responses": {
+          "201": { "description": "Trail created successfully" },
+          "400": { "description": "Invalid input" },
+          "422": { "description": "Validation error" }
+        }
+      }
+    },
+    "/trails/{Trail_ID}": {
+      "get": {
+        "summary": "Get Trail By ID",
+        "description": "Retrieve details of a specific trail.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "Trail_ID",
+            "required": true,
+            "type": "integer",
+            "description": "ID of the trail to retrieve"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Trail details",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "Trail_ID": { "type": "integer" },
+                "Trail_Name": { "type": "string", "maxLength": 255 },
+                "Description": { "type": "string", "nullable": true },
+                "Country_ID": { "type": "integer", "nullable": true },
+                "State_ID": { "type": "integer", "nullable": true },
+                "City_ID": { "type": "integer", "nullable": true },
+                "Distance": { "type": "number", "format": "float" },
+                "Created_On": { "type": "string", "format": "date" },
+                "Elevation_Gain": { "type": "integer", "nullable": true },
+                "Estimated_Time": { "type": "integer", "nullable": true },
+                "Route_Type": { "type": "string", "enum": ["Point to Point", "Out & Back", "Loop"], "nullable": true },
+                "User_ID": { "type": "integer" }
+              }
+            }
+          },
+          "404": { "description": "Trail not found" }
+        }
+      },
+      "put": {
+        "summary": "Update Trail",
+        "description": "Update details of an existing trail.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "Trail_ID",
+            "required": true,
+            "type": "integer",
+            "description": "ID of the trail to update"
+          },
+          {
+            "in": "body",
+            "name": "trail",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "Trail_Name": { "type": "string", "maxLength": 255 },
+                "Description": { "type": "string", "nullable": true },
+                "Country_ID": { "type": "integer", "nullable": true },
+                "State_ID": { "type": "integer", "nullable": true },
+                "City_ID": { "type": "integer", "nullable": true },
+                "Distance": { "type": "number", "format": "float" },
+                "Elevation_Gain": { "type": "integer", "nullable": true },
+                "Estimated_Time": { "type": "integer", "nullable": true },
+                "Route_Type": { "type": "string", "enum": ["Point to Point", "Out & Back", "Loop"], "nullable": true },
+                "User_ID": { "type": "integer" }
+              },
+              "required": ["Trail_Name", "Distance", "User_ID"]
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Trail updated successfully" },
+          "404": { "description": "Trail not found" },
+          "400": { "description": "Invalid input" }
+        }
+      },
+      "delete": {
+        "summary": "Delete Trail",
+        "description": "Remove a trail from the database.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "Trail_ID",
+            "required": true,
+            "type": "integer",
+            "description": "ID of the trail to delete"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Trail deleted successfully" },
+          "404": { "description": "Trail not found" }
+        }
+      }
+    }
+  }
 }
