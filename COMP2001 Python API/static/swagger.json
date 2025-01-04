@@ -171,6 +171,58 @@
                 }
             }
         },
+        "/trails/update": {
+            "put": {
+                "summary": "Update a trail",
+                "description": "Update an existing trail using the UpdateTrail stored procedure.",
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "Trail_ID": { "type": "integer" },
+                                "Trail_Name": { "type": "string" },
+                                "Description": { "type": "string" },
+                                "Country_ID": { "type": "integer" },
+                                "State_ID": { "type": "integer" },
+                                "City_ID": { "type": "integer" },
+                                "Distance": { "type": "number", "format": "float" },
+                                "Elevation_Gain": { "type": "integer" },
+                                "Estimated_Time": { "type": "integer" },
+                                "Route_Type": { "type": "string" },
+                                "User_ID": { "type": "integer" }
+                            },
+                            "required": [
+                                "Trail_ID", "Trail_Name", "Country_ID", "State_ID",
+                                "City_ID", "Distance", "Elevation_Gain", "Estimated_Time", "Route_Type", "User_ID"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Trail updated successfully"
+                    },
+                    "400": {
+                        "description": "Trail_ID is required"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "An error occurred while updating the trail"
+                    }
+                }
+            }
+        },
         "/trails/read": {
             "get": {
                 "summary": "Read trails",
