@@ -4,6 +4,7 @@ Overview
 This project is a microservice for managing trails as part of a larger well-being trail application. The microservice provides CRUD operations on trail data and supports secure interactions using JWT-based authentication. Users can create, read, update, and delete trail information and view trail data through a RESTful API.
 
 Features:
+
 Manage trails (create, read, update, delete).
 JWT-based authentication for secure access.
 Integration with Microsoft SQL Server for data storage.
