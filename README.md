@@ -17,9 +17,16 @@ This project uses the following dependencies:
     Flask==3.1.0
     Flask-JWT-Extended==4.7.1
     Flask-SQLAlchemy==3.1.1
-    SQLAlchemy==2.0.36
+    greenlet==3.1.1
+    itsdangerous==2.2.0
+    Jinja2==3.1.5
+    MarkupSafe==3.0.2
     pyodbc==5.0.1
+    SQLAlchemy==2.0.36
+    Werkzeug==3.1.3
     flask-swagger-ui==4.11.1
+    marshmallow==3.19.0
+    marshmallow-sqlalchemy==0.28.0
     
 For a full list of dependencies, refer to the requirements.txt.
 
