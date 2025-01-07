@@ -1,12 +1,13 @@
-from flask import Flask, request, jsonify
+from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from flask_swagger_ui import get_swaggerui_blueprint
-from sqlalchemy import text
-from marshmallow import Schema, fields, pre_load, ValidationError
 from datetime import timedelta
+from marshmallow import Schema, fields, ValidationError, pre_load
+from sqlalchemy import text
 import logging
 
+# Flask App Initialization
 app = Flask(__name__)
 
 # JWT Configuration
@@ -22,7 +23,13 @@ db = SQLAlchemy(app)
 # Logging Configuration
 logging.basicConfig(level=logging.DEBUG)
 
-# Swagger UI setup
+# Swagger Configuration
+app.config['SWAGGER'] = {
+    "title": "Trail API",
+    "uiversion": 3
+}
+
+# Swagger UI Setup
 SWAGGER_URL = '/swagger'
 API_URL = '/static/swagger.json'
 swaggerui_blueprint = get_swaggerui_blueprint(SWAGGER_URL, API_URL)
@@ -38,7 +45,21 @@ class User(db.Model):
     Name = db.Column(db.String(100))
     Created_On = db.Column(db.Date, nullable=False)
 
-# Marshmallow Schema for Validation
+class Trail(db.Model):
+    __tablename__ = 'Trail'
+    __table_args__ = {'schema': 'CW2'}
+    Trail_ID = db.Column(db.Integer, primary_key=True)
+    Trail_Name = db.Column(db.String(255), nullable=False)
+    Description = db.Column(db.Text, nullable=True)
+    Country_ID = db.Column(db.Integer, nullable=False)
+    State_ID = db.Column(db.Integer, nullable=False)
+    City_ID = db.Column(db.Integer, nullable=False)
+    Distance = db.Column(db.Float, nullable=False)
+    Elevation_Gain = db.Column(db.Float, nullable=True)
+    Estimated_Time = db.Column(db.Integer, nullable=False)
+    Route_Type = db.Column(db.String(100), nullable=False)
+    User_ID = db.Column(db.Integer, nullable=False)
+
 class TrailSchema(Schema):
     Trail_Name = fields.String(required=True)
     Description = fields.String()
@@ -46,7 +67,7 @@ class TrailSchema(Schema):
     State_ID = fields.Integer(required=True)
     City_ID = fields.Integer(required=True)
     Distance = fields.Float(required=True)
-    Elevation_Gain = fields.Integer(required=True)
+    Elevation_Gain = fields.Float(required=False)
     Estimated_Time = fields.Integer(required=True)
     Route_Type = fields.String(required=True)
     User_ID = fields.Integer(required=True)
@@ -58,31 +79,41 @@ class TrailSchema(Schema):
         return data
 
 # Routes
-@app.route("/", methods=["GET"])
-def home():
-    return "Welcome to the Trail API (CW2). Use /swagger to access API documentation."
+@app.route("/users", methods=["GET"])
+def get_users():
+    users = User.query.all()
+    return jsonify([{"User_ID": u.User_ID, "Email": u.Email, "Name": u.Name} for u in users])
 
+# Log in endpoint
 @app.route("/login", methods=["POST"])
 def login():
     try:
         data = request.get_json()
-        email = data.get("Email")
-        password = data.get("Password")
+        logging.debug(f"Received data: {data}")
+
+        email = data.get("Email")  
+        password = data.get("Password")  
 
         if not email or not password:
-            return jsonify({"message": "Email and Password are required"}), 400
+            logging.warning("Missing email or password in the request")
+            return jsonify({"message": "Missing email or password"}), 400
 
-        user = db.session.query(User).filter(User.Email == email).first()
-
-        if not user or user.Password != password:
+        user = User.query.filter_by(Email=email).first()
+        if not user or user.Password != password: 
             return jsonify({"message": "Invalid email or password"}), 401
 
-        access_token = create_access_token(identity={"User_ID": user.User_ID, "Email": user.Email})
+        access_token = create_access_token(identity={"User_ID": user.User_ID})
         return jsonify({"access_token": access_token}), 200
 
     except Exception as e:
         logging.error(f"Error during login: {e}")
         return jsonify({"message": "An error occurred during login"}), 500
+
+@app.route("/trails", methods=["GET"])
+@jwt_required()
+def get_trails():
+    trails = Trail.query.all()
+    return jsonify([{col.name: getattr(t, col.name) for col in Trail.__table__.columns} for t in trails])
 
 @app.route("/trails", methods=["POST"])
 @jwt_required()
@@ -90,10 +121,13 @@ def insert_trail():
     try:
         data = request.get_json()
         logging.debug(f"Received data: {data}")
-        trail_data = TrailSchema().load(data)
+        trail_data = TrailSchema().load(data)  # Validation happens here
     except ValidationError as err:
         logging.error(f"Validation error: {err.messages}")
         return jsonify({"errors": err.messages}), 422
+    except Exception as e:
+        logging.error(f"Unexpected error during validation: {e}")
+        return jsonify({"message": "Invalid request data"}), 400
 
     try:
         stmt = text("""
@@ -111,57 +145,48 @@ def insert_trail():
         """)
         db.session.execute(stmt, trail_data)
         db.session.commit()
+        logging.info("Trail successfully inserted into the database.")
         return jsonify({"message": "Trail inserted successfully"}), 201
     except Exception as e:
         logging.error(f"Database error: {e}")
         return jsonify({"message": "An error occurred while inserting the trail"}), 500
 
-@app.route("/trails/read", methods=["GET"])
+@app.route("/trails/<int:trail_id>", methods=["GET"])
 @jwt_required()
-def read_trail():
-    try:
-        trail_id = request.args.get("Trail_ID")
-        trail_name = request.args.get("Trail_Name")
-        user_id = request.args.get("User_ID")
+def get_trail_by_id(trail_id):
+    trail = Trail.query.get(trail_id)
+    if not trail:
+        return jsonify({"message": "Trail not found"}), 404
+    return jsonify({col.name: getattr(trail, col.name) for col in Trail.__table__.columns})
 
-        stmt = text("""
-            EXEC CW2.ReadTrail 
-                @Trail_ID = :Trail_ID,
-                @Trail_Name = :Trail_Name,
-                @User_ID = :User_ID
-        """)
-        results = db.session.execute(stmt, {
-            "Trail_ID": trail_id,
-            "Trail_Name": trail_name,
-            "User_ID": user_id
-        }).fetchall()
-
-        trails = [dict(row) for row in results]
-        return jsonify(trails), 200
-
-    except Exception as e:
-        logging.error(f"Error reading trails: {e}")
-        return jsonify({"message": "An error occurred while fetching trails"}), 500
-
-@app.route("/trails/delete", methods=["DELETE"])
+@app.route("/trails/<int:trail_id>", methods=["PUT"])
 @jwt_required()
-def delete_trail():
-    try:
-        trail_id = request.args.get("Trail_ID")
-        if not trail_id:
-            return jsonify({"message": "Trail_ID is required"}), 400
+def update_trail(trail_id):
+    trail = Trail.query.get(trail_id)
+    if not trail:
+        return jsonify({"message": "Trail not found"}), 404
 
-        stmt = text("""
-            EXEC CW2.DeleteTrail 
-                @Trail_ID = :Trail_ID
-        """)
-        db.session.execute(stmt, {"Trail_ID": trail_id})
+    data = request.get_json()
+    for key, value in data.items():
+        if hasattr(trail, key):
+            setattr(trail, key, value)
+    db.session.commit()
+    return jsonify({"message": "Trail updated successfully."}), 200
+
+@app.route("/trails/<int:trail_id>", methods=["DELETE"])
+@jwt_required()
+def delete_trail(trail_id):
+    trail = Trail.query.get(trail_id)
+    if not trail:
+        return jsonify({"message": "Trail not found"}), 404
+
+    try:
+        db.session.delete(trail)
         db.session.commit()
-        return jsonify({"message": "Trail deleted successfully"}), 200
-
+        return jsonify({"message": "Trail deleted successfully."}), 200
     except Exception as e:
         logging.error(f"Error deleting trail: {e}")
-        return jsonify({"message": "An error occurred while deleting the trail"}), 500
+        return jsonify({"message": "An error occurred while deleting the trail."}), 500
 
 if __name__ == '__main__':
     print("Starting the application...")
